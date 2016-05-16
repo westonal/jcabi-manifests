@@ -30,8 +30,11 @@
 package com.jcabi.manifests;
 
 import com.jcabi.log.Logger;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -125,6 +128,28 @@ public final class ManifestsTest {
             mfs.get("From-File"),
             Matchers.equalTo("some test attribute")
         );
+    }
+
+    /**
+     * When get on mulitple manifests, the first element takes precedence
+     * @throws Exception If something goes wrong
+     */
+    @Test
+    public void canGet() throws Exception {
+        final Manifests mfs = new Manifests();
+        mfs.append(this.SingleManifestStream("Attr: a\n"));
+        mfs.append(this.SingleManifestStream("Attr: b\n"));
+        MatcherAssert.assertThat(
+            "The value is from the first manifest",
+            mfs.containsKey("Attr") && mfs.get("Attr").equals("a")
+        );
+    }
+
+    private Mfs SingleManifestStream(final String manifestContent) {
+        final InputStream stream = new ByteArrayInputStream(
+            manifestContent.getBytes(StandardCharsets.UTF_8)
+        );
+        return new StreamsMfs(stream);
     }
 
 }
