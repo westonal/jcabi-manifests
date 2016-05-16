@@ -55,7 +55,7 @@ public interface MfMap extends Map<String, String> {
     /**
      * List all values for this key across all appended manifests in the order
      * they were appended.
-     * @param key
+     * @param key The key of the manifest attribute
      * @return The list of all found values
      */
     List<String> getAll(String key);

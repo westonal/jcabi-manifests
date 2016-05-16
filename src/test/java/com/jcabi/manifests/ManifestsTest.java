@@ -38,7 +38,6 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import static org.hamcrest.Matchers.contains;
 import org.junit.Test;
 
 /**
@@ -132,52 +131,67 @@ public final class ManifestsTest {
     }
 
     /**
-     * When get on multiple manifests, the first element takes precedence
+     * When get on multiple manifests, the first element takes precedence.
      * @throws Exception If something goes wrong
      */
     @Test
     public void getGetsTheFirstEntryAcrossMultipleManifests() throws Exception {
+        final String name = "Attr";
         final Manifests mfs = new Manifests();
         mfs.append(manifestStream("Attr: a\n"));
         mfs.append(manifestStream("Attr: b\n"));
         MatcherAssert.assertThat(
             "The value is from the first manifest",
-            mfs.containsKey("Attr") && mfs.get("Attr").equals("a")
+            mfs.containsKey(name) && "a".equals(mfs.get(name))
         );
     }
 
     /**
      * When multiple manifests have been appended, get all gives all the values
-     * of the attribute
-     * @throws Exception
+     * of the attribute.
+     * @throws Exception If something goes wrong
      */
     @Test
     public void getAllGetsAListOfAllValuesOfSameKey() throws Exception {
         final Manifests mfs = new Manifests();
-        mfs.append(manifestStream("Attr: a\n"));
-        mfs.append(manifestStream("Attr: b\n"));
-        MatcherAssert.assertThat(mfs.getAll("Attr"), contains("a", "b"));
+        mfs.append(manifestStream("Multi-Value-Attr: 1\n"));
+        mfs.append(manifestStream("Multi-Value-Attr: 2\n"));
+        MatcherAssert.assertThat(
+            mfs.getAll("Multi-Value-Attr"),
+            Matchers.contains("1", "2")
+        );
     }
 
     /**
      * When multiple manifests have been appended, get all gives all the values
-     * of two different attributes
-     * @throws Exception
+     * of two different attributes.
+     * @throws Exception If something goes wrong
      */
     @Test
     public void getAllGetsAListOfAllValues() throws Exception {
         final Manifests mfs = new Manifests();
-        mfs.append(manifestStream("Attr1: a\n"));
-        mfs.append(manifestStream("Attr1: b\nAttr2: c\n"));
-        mfs.append(manifestStream("Attr1: d\n"));
-        mfs.append(manifestStream("Attr2: e\n"));
-        MatcherAssert.assertThat(mfs.getAll("Attr1"), contains("a", "b", "d"));
-        MatcherAssert.assertThat(mfs.getAll("Attr2"), contains("c", "e"));
+        mfs.append(manifestStream("Attr1: 1a\n"));
+        mfs.append(manifestStream("Attr1: 1b\nAttr2: 2a\n"));
+        mfs.append(manifestStream("Attr1: 1c\n"));
+        mfs.append(manifestStream("Attr2: 2b\n"));
+        MatcherAssert.assertThat(
+            mfs.getAll("Attr1"),
+            Matchers.contains("1a", "1b", "1c")
+        );
+        MatcherAssert.assertThat(
+            mfs.getAll("Attr2"),
+            Matchers.contains("2a", "2b")
+        );
     }
 
-    private static Mfs manifestStream(final String manifestContent) {
+    /**
+     * A new in memory Manifest containing the supplied string as content
+     * @param content The content of the manifest
+     * @return A Mfs Manifest
+     */
+    private static Mfs manifestStream(final String content) {
         final InputStream stream = new ByteArrayInputStream(
-            manifestContent.getBytes(StandardCharsets.UTF_8)
+            content.getBytes(StandardCharsets.UTF_8)
         );
         return new StreamsMfs(stream);
     }
