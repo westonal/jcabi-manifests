@@ -38,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import static org.hamcrest.Matchers.contains;
 import org.junit.Test;
 
 /**
@@ -131,21 +132,50 @@ public final class ManifestsTest {
     }
 
     /**
-     * When get on mulitple manifests, the first element takes precedence
+     * When get on multiple manifests, the first element takes precedence
      * @throws Exception If something goes wrong
      */
     @Test
-    public void canGet() throws Exception {
+    public void getGetsTheFirstEntryAcrossMultipleManifests() throws Exception {
         final Manifests mfs = new Manifests();
-        mfs.append(this.SingleManifestStream("Attr: a\n"));
-        mfs.append(this.SingleManifestStream("Attr: b\n"));
+        mfs.append(manifestStream("Attr: a\n"));
+        mfs.append(manifestStream("Attr: b\n"));
         MatcherAssert.assertThat(
             "The value is from the first manifest",
             mfs.containsKey("Attr") && mfs.get("Attr").equals("a")
         );
     }
 
-    private Mfs SingleManifestStream(final String manifestContent) {
+    /**
+     * When multiple manifests have been appended, get all gives all the values
+     * of the attribute
+     * @throws Exception
+     */
+    @Test
+    public void getAllGetsAListOfAllValuesOfSameKey() throws Exception {
+        final Manifests mfs = new Manifests();
+        mfs.append(manifestStream("Attr: a\n"));
+        mfs.append(manifestStream("Attr: b\n"));
+        MatcherAssert.assertThat(mfs.getAll("Attr"), contains("a", "b"));
+    }
+
+    /**
+     * When multiple manifests have been appended, get all gives all the values
+     * of two different attributes
+     * @throws Exception
+     */
+    @Test
+    public void getAllGetsAListOfAllValues() throws Exception {
+        final Manifests mfs = new Manifests();
+        mfs.append(manifestStream("Attr1: a\n"));
+        mfs.append(manifestStream("Attr1: b\nAttr2: c\n"));
+        mfs.append(manifestStream("Attr1: d\n"));
+        mfs.append(manifestStream("Attr2: e\n"));
+        MatcherAssert.assertThat(mfs.getAll("Attr1"), contains("a", "b", "d"));
+        MatcherAssert.assertThat(mfs.getAll("Attr2"), contains("c", "e"));
+    }
+
+    private static Mfs manifestStream(final String manifestContent) {
         final InputStream stream = new ByteArrayInputStream(
             manifestContent.getBytes(StandardCharsets.UTF_8)
         );

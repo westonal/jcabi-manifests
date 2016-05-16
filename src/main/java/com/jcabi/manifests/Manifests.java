@@ -33,8 +33,10 @@ import com.jcabi.log.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -132,6 +134,15 @@ public final class Manifests implements MfMap {
      * Attributes retrieved.
      */
     private final transient Map<String, String> attributes;
+
+    /**
+     * All Attributes retrieved.
+     * @todo: #31 MultiMap is from appended manifests, so this field needs to
+     * react sensibly to manual put and remove calls. It could be possible to
+     * remove "attributes" altogether
+     */
+    private final transient Map<String, List<String>> multiMap =
+        new HashMap<String, List<String>>();
 
     static {
         try {
@@ -237,6 +248,7 @@ public final class Manifests implements MfMap {
                     this.attributes.put(attr.getKey(), attr.getValue());
                     ++saved;
                 }
+                addToMultiMap(attr.getKey(), attr.getValue());
             }
         }
         Logger.info(
@@ -249,6 +261,21 @@ public final class Manifests implements MfMap {
             new TreeSet<String>(this.attributes.keySet())
         );
         return this;
+    }
+
+    /**
+     * For a new key, adds a new list with one item otherwise adds the value to
+     * the existing list for that key.
+     * @param key
+     * @param value
+     */
+    private void addToMultiMap(final String key, final String value) {
+        List<String> allOfAttr = this.multiMap.get(key);
+        if (allOfAttr == null) {
+            allOfAttr = new ArrayList<String>();
+            this.multiMap.put(key, allOfAttr);
+        }
+        allOfAttr.add(value);
     }
 
     /**
@@ -404,4 +431,15 @@ public final class Manifests implements MfMap {
         return props;
     }
 
+    /**
+     * List all values for this key across all appended manifests in the order
+     * they were appended.
+     * @todo: #31 do not expose the internal list structure, or expose readonly
+     * collection wrapper
+     * @param key
+     * @return The list of all found values
+     */
+    public List<String> getAll(final String key) {
+        return multiMap.get(key);
+    }
 }
