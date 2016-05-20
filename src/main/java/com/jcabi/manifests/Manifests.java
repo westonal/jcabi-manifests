@@ -204,7 +204,7 @@ public final class Manifests implements MfMap {
      * @param key The key of the manifest attribute
      * @return The list of all found values
      */
-    public List<String> getAll(final String key) {
+    public List<String> allValues(final String key) {
         return new ArrayList<String>(this.multimap.get(key));
     }
 

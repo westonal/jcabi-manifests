@@ -154,12 +154,12 @@ public final class ManifestsTest {
      * @throws Exception If something goes wrong
      */
     @Test
-    public void getAllGetsAListOfAllValuesOfSameKey() throws Exception {
+    public void allValuesGetsAListOfAllValuesOfSameKey() throws Exception {
         final Manifests mfs = new Manifests();
         mfs.append(manifestStream("Multi-Value-Attr: 1\n"));
         mfs.append(manifestStream("Multi-Value-Attr: 2\n"));
         MatcherAssert.assertThat(
-            mfs.getAll("Multi-Value-Attr"),
+            mfs.allValues("Multi-Value-Attr"),
             Matchers.contains("1", "2")
         );
     }
@@ -170,18 +170,18 @@ public final class ManifestsTest {
      * @throws Exception If something goes wrong
      */
     @Test
-    public void getAllGetsAListOfAllValues() throws Exception {
+    public void allValuesGetsAListOfAllValues() throws Exception {
         final Manifests mfs = new Manifests();
         mfs.append(manifestStream("Attr1: 1a\n"));
         mfs.append(manifestStream("Attr1: 1b\nAttr2: 2a\n"));
         mfs.append(manifestStream("Attr1: 1c\n"));
         mfs.append(manifestStream("Attr2: 2b\n"));
         MatcherAssert.assertThat(
-            mfs.getAll("Attr1"),
+            mfs.allValues("Attr1"),
             Matchers.contains("1a", "1b", "1c")
         );
         MatcherAssert.assertThat(
-            mfs.getAll("Attr2"),
+            mfs.allValues("Attr2"),
             Matchers.contains("2a", "2b")
         );
     }
@@ -192,19 +192,19 @@ public final class ManifestsTest {
      * @throws Exception If something goes wrong
      */
     @Test
-    public void listReturnedByGetAllValuesIsACopy() throws Exception {
+    public void listReturnedByAllValuesIsACopy() throws Exception {
         final String attr = "Attr3";
         final String first = "first";
         final String second = "second";
         final Manifests mfs = new Manifests();
         mfs.append(manifestStream("Attr3: first\n"));
-        final List<String> list = mfs.getAll(attr);
+        final List<String> list = mfs.allValues(attr);
         mfs.append(manifestStream("Attr3: second\n"));
         MatcherAssert.assertThat(
             list, Matchers.contains(first)
         );
         MatcherAssert.assertThat(
-            mfs.getAll(attr),
+            mfs.allValues(attr),
             Matchers.contains(first, second)
         );
     }
