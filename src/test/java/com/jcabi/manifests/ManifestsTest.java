@@ -189,22 +189,23 @@ public final class ManifestsTest {
     /**
      * Manifest can return a list of all values that will not get mutated by
      * further append operations.
-     * @throws Exception
+     * @throws Exception If something goes wrong
      */
     @Test
     public void listReturnedByGetAllValuesIsACopy() throws Exception {
-        final String attr = "Attr2";
+        final String attr = "Attr3";
+        final String first = "first";
+        final String second = "second";
         final Manifests mfs = new Manifests();
-        mfs.append(manifestStream("Attr2: a\n"));
-        mfs.append(manifestStream("Attr2: b\n"));
-        final List<String> list = mfs.getAll("Attr2");
-        mfs.append(manifestStream("Attr2: c\n"));
+        mfs.append(manifestStream("Attr3: first\n"));
+        final List<String> list = mfs.getAll(attr);
+        mfs.append(manifestStream("Attr3: second\n"));
         MatcherAssert.assertThat(
-            list, Matchers.contains("a", "b")
+            list, Matchers.contains(first)
         );
         MatcherAssert.assertThat(
-            mfs.getAll("Attr2"),
-            Matchers.contains("a", "b", "c")
+            mfs.getAll(attr),
+            Matchers.contains(first, second)
         );
     }
 
