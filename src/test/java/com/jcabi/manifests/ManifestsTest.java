@@ -132,7 +132,8 @@ public final class ManifestsTest {
     }
 
     /**
-     * When get on multiple manifests, the first element takes precedence.
+     * Manifests can get the first value when multiple manifests with the same
+     * attribute have been appended.
      * @throws Exception If something goes wrong
      */
     @Test
@@ -148,8 +149,8 @@ public final class ManifestsTest {
     }
 
     /**
-     * When multiple manifests have been appended, get all gives all the values
-     * of the attribute.
+     * Manifests can get allValues of an attribute across multiple appended
+     * manifests.
      * @throws Exception If something goes wrong
      */
     @Test
@@ -164,8 +165,8 @@ public final class ManifestsTest {
     }
 
     /**
-     * When multiple manifests have been appended, get all gives all the values
-     * of two different attributes.
+     * Manifest can get allValues of two attributes across multiple appended
+     * manifests.
      * @throws Exception If something goes wrong
      */
     @Test
