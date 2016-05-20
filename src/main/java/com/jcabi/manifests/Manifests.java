@@ -201,13 +201,11 @@ public final class Manifests implements MfMap {
     /**
      * List all values for this key across all appended manifests in the order
      * they were appended.
-     * @todo: #31 do not expose the internal list structure, or expose readonly
-     *  collection wrapper
      * @param key The key of the manifest attribute
      * @return The list of all found values
      */
     public List<String> getAll(final String key) {
-        return this.multimap.get(key);
+        return new ArrayList<String>(this.multimap.get(key));
     }
 
     @Override

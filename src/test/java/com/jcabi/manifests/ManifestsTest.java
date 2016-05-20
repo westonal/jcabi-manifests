@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -181,6 +182,28 @@ public final class ManifestsTest {
         MatcherAssert.assertThat(
             mfs.getAll("Attr2"),
             Matchers.contains("2a", "2b")
+        );
+    }
+
+    /**
+     * Manifest can return a list of all values that will not get mutated by
+     * further append operations.
+     * @throws Exception
+     */
+    @Test
+    public void listReturnedByGetAllValuesIsACopy() throws Exception {
+        final String attr = "Attr2";
+        final Manifests mfs = new Manifests();
+        mfs.append(manifestStream("Attr2: a\n"));
+        mfs.append(manifestStream("Attr2: b\n"));
+        final List<String> list = mfs.getAll("Attr2");
+        mfs.append(manifestStream("Attr2: c\n"));
+        MatcherAssert.assertThat(
+            list, Matchers.contains("a", "b")
+        );
+        MatcherAssert.assertThat(
+            mfs.getAll("Attr2"),
+            Matchers.contains("a", "b", "c")
         );
     }
 
